@@ -1,3 +1,8 @@
+// Copyright (c) 2011, XMOS Ltd, All rights reserved
+// This software is freely distributable under a derivative of the
+// University of Illinois/NCSA Open Source License posted in
+// LICENSE.txt and at <http://github.xcore.com/>
+
 #define PS2_NONE 0
 #define PS2_PRESS 1
 #define PS2_RELEASE 2
@@ -60,28 +65,10 @@ extern select ps2Handler(port ps2_clock, port ps2_data, struct ps2state &state) 
  */
 {unsigned,unsigned,unsigned} extern ps2Interpret(struct ps2state state) ;
 
-/** Convenience function that continuously processes PS2 requests, and
- * outputs pressed and released keys over a channel end. The function sends
- * three values {action,modifier,key} as three integers over a channel end.
- * It does not return, and shoul dbe called as part of a par statement.
- *
- * \param ps2_clock the port that is connected to the PS2 clock signal.
- *                  This should be declared as an unbuffered non-directional
- *                  port.
- *
- * \param ps2_data  the port that is connected to the PS2 data signal.
- *                  This should be declared as an unbuffered non-directional
- *                  port.
- *
- * \param c         channel over which to output key presses and releases.
- */
-extern void ps2Process(port ps2_clock, port ps2_data, chanend c) ;
-
 /** This function looks up a key code and returns the code that the USB HID
  * keyboard spec expects, or -1 if the key cannot be mapped.
  *
- * \param keycode   keycode as returned by ps2Interpret() or as returned over
- *                  chanend c by ps2Process().
+ * \param keycode   keycode as returned by ps2Interpret()
  */
 extern int ps2USB(unsigned int keycode) ;
 
@@ -89,10 +76,8 @@ extern int ps2USB(unsigned int keycode) ;
 /** (TODO) This function looks up a keycode and modifier and returns the ASCII equivalent
  * or -1 if the key cannot be mapped.
  *
- * \param modifier  modifier as returned by ps2Interpret() or as returned over
- *                  chanend c by ps2Process().
+ * \param modifier  modifier as returned by ps2Interpret()
  *
- * \param keycode   keycode as returned by ps2Interpret() or as returned over
- *                  chanend c by ps2Process().
+ * \param keycode   keycode as returned by ps2Interpret()
  */
 extern int ps2ASCII(unsigned modifier, unsigned int keycode);

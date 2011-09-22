@@ -1,3 +1,8 @@
+// Copyright (c) 2011, XMOS Ltd, All rights reserved
+// This software is freely distributable under a derivative of the
+// University of Illinois/NCSA Open Source License posted in
+// LICENSE.txt and at <http://github.xcore.com/>
+
 #include <xs1.h>
 #include <print.h>
 #include "ps2.h"
@@ -141,22 +146,3 @@ case ps2_clock when pinseq(state.clockValue) :> void:
     }
     return {result,state.modifier,key};
 }
-
-extern void ps2Process(port ps2_clock, port ps2_data, chanend c) {
-    unsigned action, key, modifier;
-	// This process will maintain the state of shift and control
-    
-    struct ps2state state;
-
-    ps2HandlerInit(state);
-
-	// Loop
-	while (1) {
-        ps2Handler(ps2_clock, ps2_data, state);
-        {action, modifier, key} = ps2Interpret(state);
-        if (action == PS2_PRESS) {
-            c <: ps2ASCII(modifier, key);
-        }
-	}
-}
-
