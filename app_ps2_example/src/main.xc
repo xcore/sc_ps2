@@ -1,6 +1,11 @@
+// Copyright (c) 2011, XMOS Ltd, All rights reserved
+// This software is freely distributable under a derivative of the
+// University of Illinois/NCSA Open Source License posted in
+// LICENSE.txt and at <http://github.xcore.com/>
+
 #include <xs1.h>
 #include <platform.h>
-#include <print.h>
+#include <stdio.h>
 
 #include "ps2.h"
 
@@ -23,4 +28,5 @@ int main(void) {
             printf("Modifiers 0x%02x release %d\n", modifier, key);
         }
     }
+    return 0;
 }
