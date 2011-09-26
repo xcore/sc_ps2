@@ -12,7 +12,7 @@
 on stdcore[0]: port ps2_clock = XS1_PORT_1A;
 on stdcore[0]: port ps2_data = XS1_PORT_1L;
 
-int main(void) {
+int core0main(streaming chanend c) {
     unsigned action, key, modifier;
     struct ps2state state;
 
@@ -22,11 +22,38 @@ int main(void) {
     while (1) {
         ps2Handler(ps2_clock, ps2_data, state);
         {action, modifier, key} = ps2Interpret(state);
-        if (action == PS2_PRESS) {
-            printf("Modifiers 0x%02x press %d\n", modifier, key);
-        } else if (action == PS2_RELEASE) {
-            printf("Modifiers 0x%02x release %d\n", modifier, key);
+        if (action == PS2_PRESS || action == PS2_RELEASE) {
+            c <: (unsigned char) action;
+            c <: (unsigned char) modifier;
+            c <: (unsigned char) key;
         }
+    }
+    return 0;
+}
+
+int core1main(streaming chanend c) {
+    unsigned char k, x, y, z;
+
+	// Loop
+    while (1) {
+    c :> x;
+    c :> y;
+    c :> z;
+        k = ps2ASCII(y, z);
+        if (x == PS2_PRESS) {
+            printf("Modifiers 0x%02x press %d - %d\n", y, z, k);
+        } else if (x == PS2_RELEASE) {
+            printf("Modifiers 0x%02x release %d - %d\n", y, z, k);
+        }
+    }
+    return 0;
+}
+
+int main(void) {
+    streaming chan c;
+    par {
+        on stdcore[0]: core0main(c);
+        on stdcore[1]: core1main(c);
     }
     return 0;
 }

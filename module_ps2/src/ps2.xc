@@ -5,20 +5,17 @@
 
 #include <xs1.h>
 #include <print.h>
+#include <stdio.h>
 #include "ps2.h"
 
 
-#define INT_PS2_NOTAKEY    ((unsigned char)(0xFF))
-#define INT_PS2_SHIFT      ((unsigned char)(0xFE))
-#define INT_PS2_CTRL       ((unsigned char)(0xFD))
-#define INT_PS2_CAPS       ((unsigned char)(0xFC))
-#define INT_PS2_NUM        ((unsigned char)(0XFB))
+#define INT_PS2_NOTAKEY    (0xFF)
+#define INT_PS2_SHIFT      (89)
+#define INT_PS2_CTRL       (20)
 
-#define INT_PS2_RELEASE    ((unsigned char)(0xF0))
-#define INT_PS2_EXT      ((unsigned char)(0xE0))
-#define INT_PS2_PAUSE      ((unsigned char)(0xE1))
-
-#define INT_PS2_MINNONKEY  ((unsigned char)(0xE1))
+#define INT_PS2_RELEASE    (0xF0)
+#define INT_PS2_EXT        (0xE0)
+#define INT_PS2_PAUSE      (0xE1)
 
 enum {
     START_BIT = 0,
@@ -49,10 +46,12 @@ void ps2HandlerInit(struct ps2state &state) {
 select ps2Handler(port ps2_clock, port ps2_data, struct ps2state &state) {
 case ps2_clock when pinseq(state.clockValue) :> void:
     if (state.clockValue == 0) { // seen rising edge
-    ps2_data :> state.bit;
+        ps2_data :> state.bit;
         switch(state.mode) {
         case START_BIT: 
-            if (state.bit == 0) state.mode = BIT0;
+            if (state.bit == 0) {
+                state.mode = BIT0;
+            }
             break;
         case BIT0:
         case BIT1:
@@ -71,6 +70,7 @@ case ps2_clock when pinseq(state.clockValue) :> void:
             unsigned int parity;
             parity = state.bits | state.bit<<8;
             crc32(parity, 0x1, 0);
+        
             if (parity == 1) {
                 state.mode = STOP_BIT;
             } else {
@@ -80,25 +80,24 @@ case ps2_clock when pinseq(state.clockValue) :> void:
         }
             break;
         case STOP_BIT: 
-            if (state.bit == 0) {
+            if (state.bit == 1) {
                 if (state.valid) {
                     state.overrunErrors++;
                 }
                 state.value = state.bits;
                 state.valid = 1;
-                state.mode = BIT0;
             } else {
                 state.stopErrors++;
-                state.mode = START_BIT;
             }
+            state.mode = START_BIT;
             break;
         }
     }
-    state.clockValue = ~state.clockValue;
+    state.clockValue = !state.clockValue;
     break;
 }
 
-{unsigned,unsigned,unsigned} ps2Interpret(struct ps2state state) {
+{unsigned,unsigned,unsigned} ps2Interpret(struct ps2state &state) {
     int key, result;
     if (!state.valid) {
         return {PS2_NONE, 0, 0};
@@ -107,6 +106,9 @@ case ps2_clock when pinseq(state.clockValue) :> void:
     key = state.value;
     if (key == INT_PS2_RELEASE) {
         state.released = 1;
+        result = PS2_NONE;
+    } else if (key == INT_PS2_EXT) {
+        state.ext = 1;
         result = PS2_NONE;
     } else {
         switch (key) {
@@ -126,14 +128,14 @@ case ps2_clock when pinseq(state.clockValue) :> void:
             }
             result = PS2_NONE;
             break;
-        case INT_PS2_EXT:
+/*        case INT_PS2_EXT:
             if (state.released) {
                 state.modifier &= ~PS2_MODIFIER_EXT;
             } else {
                 state.modifier |= PS2_MODIFIER_EXT;
             }
             result = PS2_NONE;
-            break;
+            break;*/
         default:
             if (state.released) {
                 result = PS2_RELEASE;

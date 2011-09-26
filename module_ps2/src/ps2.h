@@ -21,6 +21,7 @@ struct ps2state {
     int bit; /// this should not be in this structure but be a local var.
     int modifier;
     int released;
+    int ext;
 };
 
 /** This function initialises the state structure that remembers the PS2
@@ -63,7 +64,7 @@ extern select ps2Handler(port ps2_clock, port ps2_data, struct ps2state &state) 
  *
  * \param state     the variable that holds the PS2 state.
  */
-{unsigned,unsigned,unsigned} extern ps2Interpret(struct ps2state state) ;
+{unsigned,unsigned,unsigned} extern ps2Interpret(struct ps2state &state) ;
 
 /** This function looks up a key code and returns the code that the USB HID
  * keyboard spec expects, or -1 if the key cannot be mapped.

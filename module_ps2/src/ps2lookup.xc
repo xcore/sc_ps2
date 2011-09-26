@@ -1,8 +1,3 @@
-// Copyright (c) 2011, XMOS Ltd, All rights reserved
-// This software is freely distributable under a derivative of the
-// University of Illinois/NCSA Open Source License posted in
-// LICENSE.txt and at <http://github.xcore.com/>
-
 #include "ps2.h"
 
 static char ps2lookupUSB[0x85] = {
@@ -25,9 +20,150 @@ static char ps2lookupUSB[0x85] = {
     0x00, 0x00, 0x00, 0x00, 0x56,
 };
 
-static char ps2lookupASCII[0x85] = {
-    0
-    // todo: ascii lookup table
+static char ps2lookupASCII[0x85] = {    
+		0, //                        
+		0, // F9                     
+		0, //                        
+		0, // F5    
+		0, // F3                     
+		0, // F1                     
+		0, // F2                     
+		0, // F12                    
+		0, //                        
+		0, // F10                    
+		0, // F8                     
+		0, // F6                     
+		0, // F4                     
+		0x09, // TAB                    
+		0x60, // ` or |                        
+		0, //                        
+		0, //                        
+		0, // Left ALT               
+		0, //PS2_SHIFT, // Left SHIFT               
+		0, //                        
+		0, //PS2_CTRL, // Left Ctrl                 
+		'q', // Q                              
+		'1', // 1 or !                         
+		0, //                        
+		0, //                        
+		0, //                        
+		'z', // Z                              
+		's', // S                              
+		'a', // A                              
+		'w', // W                              
+		'2', // 2 or @                         
+		0, //                        
+		0, //                        
+		'c', // C                              
+		'x', // X                              
+		'd', // D                              
+		'e', // E                              
+		'4', // 4 or $                         
+		'3', // 3 or ¬£                         
+		0, //                        
+		0, //                        
+		' ', // Space                          
+		'v', // V                              
+		'f', // F                              
+		't', // T                              
+		'r', // R                              
+		'5', // 5 or %                         
+		0, //                        
+		0, //                        
+		'n', // N                              
+		'b', // B                              
+		'h', // H                              
+		'g', // G                              
+		'y', // Y                              
+		'6', // 6 or ^                         
+		0, //                        
+		0, //                        
+		0, //                        
+		'm', // M                              
+		'j', // J                              
+		'u', // U                              
+		'7', // 7 or &                         
+		'8', // 8 or *                         
+		0, //                        
+		0, //                        
+		',', // , or <                         
+		'k', // K                              
+		'i', // I                              
+		'o', // o                        
+		'0', // 0 or ) 
+		'9', // 9 or (                                    
+		0, //                                      
+		0, //                         
+		'.', // . or >
+		'/', // / or ?
+		'l', // L                                              
+		';', // ; or :                              
+		'p', // p                         
+		'-', // - or _                     
+		0, //                        
+		0, //                        
+		0, // 
+		0x27,        //  ' or @                                          
+		0, //                        
+		'[', // [ or {                         
+		'=', // = OR +                         
+		0, //                        
+		0, // Caps Lock                      
+		0, //PS2_CAPS, 
+		0, //PS2_SHIFT, // Right Shift 
+		0x0D, // Enter                     
+		']', // ] or }                                     
+		0, // 
+		'#', // # or |                                 
+		0, //                        
+		0, //                        
+		0, //
+		'\\',        // \ or | UK KEYBOARD                                    
+		0, //                        
+		0, //                        
+		0, //                        
+		0, //
+		0x08, // Backspace                                  
+		0, //                        
+		0, // NUM - 1 or END         
+		'1', //                        
+		0, // NUM - 4 or LEFT        
+		'4', // NUM - 7 or HOME        
+		'7', //                        
+		0, //                        
+		0, //                         
+		'.', // NUM - . or DEL
+		'0', // NUM - 0 or INS         
+		'.', // NUM - 2 or DOWN        
+		'2', // NUM - 5                
+		'5', // NUM - 6 or RIGHT       
+		'6', // NUM - 8 or UP          
+		'8', // F11                       
+		0x1B, // ESC    76                   
+		0, //PS2_NUM, // NUM LOCK                    
+		0, // NUM - + (Plus)         
+		'+', // NUM 3 or PAGE DOWN     
+		'3', // NUM - - (Minus)        
+		'-', // NUM - *                
+		'*', // NUM - 9 or PAGE UP     
+		'9', // SCROLL LOCK            
+		0, //                        
+		0, //                        
+		0, //                        
+		0, //                        
+		0, // F7                     
+		0, //                        
+		0, //                        
+		0, //                        
+		0, //                        
+		0, //                        
+		0, //                        
+		0, //                        
+		0, //                        
+		0, //                        
+		0, //                        
+		0, //                        
+		0
 };
 
 int ps2USB(unsigned int value) {
@@ -35,6 +171,19 @@ int ps2USB(unsigned int value) {
 }
 
 int ps2ASCII(unsigned int modifier, unsigned int value) {
-    // todo: modifier interpretation
-    return value < sizeof(ps2lookupASCII) ? ps2lookupASCII[value] : -1;
+    value = value < sizeof(ps2lookupASCII) ? ps2lookupASCII[value] : -1;
+    if (modifier & PS2_MODIFIER_SHIFT) {
+        if (value >= 'a' && value <= 'z') {
+            return value - 0x20;
+        }
+        if (value >= '1' && value <= '0') {
+            return value - 0x10;
+        }
+        return value;
+    } else if (modifier & PS2_MODIFIER_SHIFT) {
+        if (value >= 'a' && value <= 'z') {
+            return value - 0x60;
+        }
+    }
+    return value;
 }
