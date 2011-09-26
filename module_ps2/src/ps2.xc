@@ -9,13 +9,12 @@
 #include "ps2.h"
 
 
-#define INT_PS2_NOTAKEY    (0xFF)
 #define INT_PS2_SHIFT      (89)
 #define INT_PS2_CTRL       (20)
+#define INT_PS2_ALT        (17)
 
 #define INT_PS2_RELEASE    (0xF0)
 #define INT_PS2_EXT        (0xE0)
-#define INT_PS2_PAUSE      (0xE1)
 
 enum {
     START_BIT = 0,
@@ -100,7 +99,7 @@ case ps2_clock when pinseq(state.clockValue) :> void:
 {unsigned,unsigned,unsigned} ps2Interpret(struct ps2state &state) {
     int key, result;
     if (!state.valid) {
-        return {PS2_NONE, 0, 0};
+        return {PS2_NONE, state.modifier, 0};
     }
     state.valid = 0;
     key = state.value;
@@ -108,7 +107,6 @@ case ps2_clock when pinseq(state.clockValue) :> void:
         state.released = 1;
         result = PS2_NONE;
     } else if (key == INT_PS2_EXT) {
-        state.ext = 1;
         result = PS2_NONE;
     } else {
         switch (key) {
@@ -128,14 +126,14 @@ case ps2_clock when pinseq(state.clockValue) :> void:
             }
             result = PS2_NONE;
             break;
-/*        case INT_PS2_EXT:
+        case INT_PS2_ALT:
             if (state.released) {
-                state.modifier &= ~PS2_MODIFIER_EXT;
+                state.modifier &= ~PS2_MODIFIER_ALT;
             } else {
-                state.modifier |= PS2_MODIFIER_EXT;
+                state.modifier |= PS2_MODIFIER_ALT;
             }
             result = PS2_NONE;
-            break;*/
+            break;
         default:
             if (state.released) {
                 result = PS2_RELEASE;

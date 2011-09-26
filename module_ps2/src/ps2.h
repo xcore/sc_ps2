@@ -7,9 +7,9 @@
 #define PS2_PRESS 1
 #define PS2_RELEASE 2
 
-#define PS2_MODIFIER_SHIFT 1
-#define PS2_MODIFIER_CTRL 2
-#define PS2_MODIFIER_EXT 4
+#define PS2_MODIFIER_CTRL 1
+#define PS2_MODIFIER_SHIFT 2
+#define PS2_MODIFIER_ALT 4
 
 struct ps2state {
     int mode;
@@ -21,7 +21,6 @@ struct ps2state {
     int bit; /// this should not be in this structure but be a local var.
     int modifier;
     int released;
-    int ext;
 };
 
 /** This function initialises the state structure that remembers the PS2
