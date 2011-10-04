@@ -30,21 +30,22 @@ enum {
     STOP_BIT
 } ;
 
-void ps2HandlerInit(struct ps2state &state) {
+void ps2HandlerInit(port ps2_clock, struct ps2state &state) {
     state.overrunErrors = 0;
     state.parityErrors = 0;
     state.stopErrors = 0;
     state.valid = 0;
     state.bits = 0;
     state.mode = START_BIT;
+    ps2_clock :> state.clockValue;
     state.clockValue = 1;
     state.modifier = 0;
     state.released = 0;
 }
 
-select ps2Handler(port ps2_clock, port ps2_data, struct ps2state &state) {
-case ps2_clock when pinseq(state.clockValue) :> void:
-    if (state.clockValue == 0) { // seen rising edge
+select ps2Handler(port ps2_clock, port ps2_data, int clockBit, struct ps2state &state) {
+case ps2_clock when pinsneq(state.clockValue) :> int new:
+    if ((~state.clockValue & new) >> clockBit & 1) { // seen rising edge
         ps2_data :> state.bit;
         switch(state.mode) {
         case START_BIT: 
@@ -91,8 +92,10 @@ case ps2_clock when pinseq(state.clockValue) :> void:
             state.mode = START_BIT;
             break;
         }
+    } else {
+        // falling clock or some other change to port, irrelevant to PS/2 clock.
     }
-    state.clockValue = !state.clockValue;
+    state.clockValue = new;
     break;
 }
 

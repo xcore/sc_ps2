@@ -28,9 +28,13 @@ struct ps2state {
  * pressed, etc). It should be called prior to calling the ps2Handler() or
  * ps2Interpret() functions.
  *
+ * \param ps2_clock the port that is connected to the PS2 clock signal.
+ *                  This should be declared as an unbuffered non-directional
+ *                  port.
+ *
  * \param state    the variable that holds the PS2 state.
  **/
-extern void ps2HandlerInit(struct ps2state &state) ;
+extern void ps2HandlerInit(port ps2_clock, struct ps2state &state) ;
 
 /** This function is a select function that handles with data that comes in
  * on the PS2 I/O lines. It can either be called as a normal function, or
@@ -48,9 +52,13 @@ extern void ps2HandlerInit(struct ps2state &state) ;
  *                  This should be declared as an unbuffered non-directional
  *                  port.
  *
+ * \param clockBit  The bit number to which the clock is connected, 0 for a
+ *                  one-bit port.
+ *
  * \param state     the variable that holds the PS2 state.
  **/
-extern select ps2Handler(port ps2_clock, port ps2_data, struct ps2state &state) ;
+extern select ps2Handler(port ps2_clock, port ps2_data, int clockBit,
+                         struct ps2state &state) ;
 
 /** This function can be called after hte ps2Handler function to interpret
  * whether anything interesting has happened. It returns three values: an
