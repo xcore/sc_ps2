@@ -1,11 +1,12 @@
 <?xml version="1.0" ?>
 <xpd>
     <components>
-        <component description = "A module for interfacing to a PS/2 mouse and &lt;Add one line here&gt;" scope = "Example" path = "module_ps2" type = "demoCode" id = "module_ps2" name = "PS/2 Keyboard Component">
+        <component description = "A module for interfacing to a PS/2 mouse and &lt;Add one line here&gt;" type = "demoCode" scope = "Example" path = "module_ps2" local = "false" id = "module_ps2" name = "PS/2 Keyboard Component">
             <keyword>keyboard</keyword>
             <keyword>ps/2</keyword>
         </component>
-        <component description = "A demo application showing the use of the PS/2 component" scope = "Example" path = "app_ps2_example" type = "demoCode" id = "app_ps2_example" name = "PS/2 Keyboard Component Demo">
+        <component description = "A demo application showing the use of the PS/2 component" type = "demoCode" scope = "Example" path = "app_ps2_example" local = "false" id = "app_ps2_example" name = "PS/2 Keyboard Component Demo">
+            <componentDependency>module_ps2</componentDependency>
             <keyword>keyboard</keyword>
             <keyword>ps/2</keyword>
         </component>
@@ -14,9 +15,9 @@
     <location>git@github.com:xcore/sc_ps2</location>
     <name>sc_ps2</name>
     <maintainer>henkmuller</maintainer>
-    <xcore_partnumber>XM-001880-DH</xcore_partnumber>
-    <xcore_subpartnumber>XM-001881-SM</xcore_subpartnumber>
     <vendor>XMOS</vendor>
+    <xcore_partnumber>XM-001880-DH</xcore_partnumber>
     <xcore_repo>sc_ps2</xcore_repo>
+    <xcore_subpartnumber>XM-001881-SM</xcore_subpartnumber>
     <xpd_version>1.0</xpd_version>
 </xpd>
