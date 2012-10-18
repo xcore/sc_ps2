@@ -16,11 +16,11 @@ int core0main(streaming chanend c) {
     unsigned action, key, modifier;
     struct ps2state state;
 
-    ps2HandlerInit(state);
+    ps2HandlerInit(ps2_clock, state);
 
 	// Loop
     while (1) {
-        ps2Handler(ps2_clock, ps2_data, state);
+        ps2Handler(ps2_clock, ps2_data, 0, state);
         {action, modifier, key} = ps2Interpret(state);
         if (action == PS2_PRESS || action == PS2_RELEASE) {
             c <: (unsigned char) action;
